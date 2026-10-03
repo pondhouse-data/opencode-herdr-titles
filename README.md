@@ -12,7 +12,7 @@ activity tracking, or OpenCode's outer terminal title.
 With OpenCode **V2** (use `opencode2` if V1 and V2 coexist):
 
 ```sh
-opencode2 plugin add github:pondhouse-data/opencode-herdr-titles#v0.1.0
+opencode2 plugin add github:pondhouse-data/opencode-herdr-titles#v0.2.0
 ```
 
 Or append the GitHub package to your global `~/.config/opencode/opencode.json`:
@@ -20,7 +20,7 @@ Or append the GitHub package to your global `~/.config/opencode/opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["github:pondhouse-data/opencode-herdr-titles#v0.1.0"]
+  "plugins": ["github:pondhouse-data/opencode-herdr-titles#v0.2.0"]
 }
 ```
 
@@ -47,11 +47,56 @@ herdr server reload-config
 The `terminal_title` and `terminal_title_stripped` tokens still show OpenCode's
 OSC title, including its prefix. They intentionally are not modified.
 
+### Title-only, two-line sidebar
+
+Version 0.2 adds `$title_line_1` and `$title_line_2` metadata tokens. To use the
+space for titles rather than location metadata:
+
+```toml
+[ui]
+# Reserve room for 30 title columns, indentation, divider, and scrollbar.
+sidebar_width = 36
+sidebar_min_width = 36
+sidebar_max_width = 36
+
+[ui.sidebar.agents.rows_by_agent]
+opencode = [
+  ["state_icon", { token = "$title_line_1", bold = true }],
+  [{ token = "$title_line_2", bold = true }]
+]
+```
+
+```text
+● Using OpenCode session titles
+  for Herdr agent panes
+```
+
+Short titles take one line. Long titles wrap at a word boundary when practical;
+overflow beyond two lines gets an ellipsis on the second line. The split respects
+terminal-cell widths and Unicode graphemes. The complete metadata title and pane
+border remain unchanged. Herdr itself does not wrap tokens automatically.
+
+For another sidebar width, set the plugin's `titleLineWidth` option (8–80,
+default 30) and leave at least six extra columns in the sidebar:
+
+```json
+{
+  "plugins": [{
+    "package": "github:pondhouse-data/opencode-herdr-titles#v0.2.0",
+    "options": { "titleLineWidth": 24 }
+  }]
+}
+```
+
+Reload Herdr after changing its configuration. This layout applies to expanded
+desktop agent rows; mobile/collapsed layouts retain Herdr's own presentation.
+
 ## Behavior
 
 - Uses the selected root session's actual title, not the shortened OSC title.
 - Follows auto-generated titles, manual renames, and session switches.
-- Publishes only `title` and `display_agent` through Herdr's metadata API.
+- Publishes `title`, `display_agent`, and the two optional title-row tokens
+  through Herdr's metadata API, never agent lifecycle or identity fields.
 - Keeps Herdr's existing session/activity integration untouched; install that
   integration separately if you want native lifecycle tracking and restore.
 - Clears its fields when leaving the session or when no title is available.
@@ -72,9 +117,10 @@ there is no need to restart Herdr or kill other agents.
 
 ## Development
 
-Pure JavaScript; no build step. Core and socket tests use Node's built-in runner:
+Pure JavaScript; no build step. Tests use Node's built-in runner:
 
 ```sh
+npm ci --ignore-scripts
 npm run check
 npm test
 ```

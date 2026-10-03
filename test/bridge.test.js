@@ -61,6 +61,7 @@ test("reports the native root title, not the OSC prefix, without lifecycle field
   assert.equal(params.source, SOURCE);
   assert.equal(params.agent, "opencode");
   assert.equal(params.ttl_ms, 15_000);
+  assert.deepEqual(params.tokens, { title_line_1: "Fix authentication", title_line_2: null });
   assert.equal("state" in params, false);
   assert.equal("agent_session_id" in params, false);
   f.route({ type: "session", sessionID: "child" });
@@ -98,6 +99,23 @@ test("leaving a session clears this source's labels", async () => {
   assert.equal(params.clear_title, true);
   assert.equal(params.clear_display_agent, true);
   assert.equal("title" in params, false);
+  assert.deepEqual(params.tokens, { title_line_1: "OpenCode", title_line_2: null });
+  stop();
+});
+
+test("publishes configured title lines and clears an obsolete second line", async () => {
+  const f = fixture();
+  f.context.options = { titleLineWidth: 12 };
+  const stop = startBridge(f.context, f.deps);
+  await settle();
+  assert.deepEqual(f.reports[0].params.tokens, {
+    title_line_1: "Fix authenti", title_line_2: "cation",
+  });
+  f.sessions.get("a").title = "Fix auth";
+  await f.event();
+  assert.deepEqual(f.reports.at(-1).params.tokens, {
+    title_line_1: "Fix auth", title_line_2: null,
+  });
   stop();
 });
 

@@ -1,4 +1,5 @@
 import { reportMetadata } from "./socket.js";
+import { configuredLineWidth, titleLines } from "./title-lines.js";
 
 export const SOURCE = "pondhouse:opencode-titles";
 const POLL_MS = 250;
@@ -22,6 +23,7 @@ export function startBridge(context, dependencies = {}) {
   const env = dependencies.env ?? process.env;
   if (env.HERDR_ENV !== "1" || !env.HERDR_PANE_ID || !env.HERDR_SOCKET_PATH) return;
 
+  const lineWidth = configuredLineWidth(context.options);
   const now = dependencies.now ?? Date.now;
   const send = dependencies.send ?? ((params, guard) => reportMetadata(env, params, guard));
   const schedule = dependencies.schedule ?? setInterval;
@@ -47,11 +49,16 @@ export function startBridge(context, dependencies = {}) {
     const revision = generation;
     const isCurrent = () => !disposed && revision === generation
       && selectedTitle(context).key === selection.key;
+    const [firstLine, secondLine] = titleLines(selection.title, lineWidth);
     const params = {
       source: SOURCE,
       agent: "opencode",
       seq: ++sequence,
       ttl_ms: TTL_MS,
+      tokens: {
+        title_line_1: firstLine,
+        title_line_2: secondLine ?? null,
+      },
       ...(selection.title
         ? { title: selection.title, display_agent: selection.title }
         : { clear_title: true, clear_display_agent: true }),
