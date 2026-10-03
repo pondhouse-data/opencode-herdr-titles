@@ -1,6 +1,6 @@
 {
   "name": "opencode-herdr-titles",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Show OpenCode V2 session titles in Herdr without the OC prefix.",
   "license": "MIT",
   "type": "module",
@@ -16,8 +16,6 @@
   "dependencies": {
     "string-width": "^7.2.0"
   },
-  "peerDependencies": { "@opencode/plugin": ">=2.0.0" },
-  "peerDependenciesMeta": { "@opencode/plugin": { "optional": true } },
   "engines": { "node": ">=22" },
   "repository": {
     "type": "git",

@@ -12,7 +12,7 @@ activity tracking, or OpenCode's outer terminal title.
 With OpenCode **V2** (use `opencode2` if V1 and V2 coexist):
 
 ```sh
-opencode2 plugin add github:pondhouse-data/opencode-herdr-titles#v0.2.0
+opencode2 plugin add github:pondhouse-data/opencode-herdr-titles#v0.2.1
 ```
 
 Or append the GitHub package to your global `~/.config/opencode/opencode.json`:
@@ -20,7 +20,7 @@ Or append the GitHub package to your global `~/.config/opencode/opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["github:pondhouse-data/opencode-herdr-titles#v0.2.0"]
+  "plugins": ["github:pondhouse-data/opencode-herdr-titles#v0.2.1"]
 }
 ```
 
@@ -82,7 +82,7 @@ default 30) and leave at least six extra columns in the sidebar:
 ```json
 {
   "plugins": [{
-    "package": "github:pondhouse-data/opencode-herdr-titles#v0.2.0",
+    "package": "github:pondhouse-data/opencode-herdr-titles#v0.2.1",
     "options": { "titleLineWidth": 24 }
   }]
 }
@@ -125,7 +125,9 @@ npm run check
 npm test
 ```
 
-OpenCode supplies its plugin runtime when loading the package.
+Entrypoints export plain V2 lifecycle definitions, as Herdr's official integration
+does. No SDK imports or build-time dependencies are required. `string-width` is
+the only runtime dependency and measures Unicode terminal-cell widths.
 
 ## References
 
